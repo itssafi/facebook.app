@@ -109,7 +109,7 @@ class FacebookUser(object):
         Comment on your object or your friend
         """
         if not user:
-            comment = comment+'  '+str(self.now)
+            comment = comment+'  '+ str(self.now)
             self.comment_box[self].append(comment)
             return "You commented '%s'." %(comment)
 
@@ -120,7 +120,7 @@ class FacebookUser(object):
             return "First accept %s's friend request !!!" %(user.name)
 
         if user not in self.list_of_friends:
-            return "%s is not your friend !!!" %s(user.name)
+            return "%s is not your friend !!!" %(user.name)
 
         user.comment_box[self].append(comment)
         return "You commented '%s' on %s" %(comment, user.name)
@@ -141,23 +141,23 @@ class FacebookUser(object):
 
             return "You commented '%s' on you." %self.comment_box[self]
 
-        elif not self.is_exists(self, user.comment_box) and not self.is_exists(user, self.comment_box):
-            return "Don't have any comment either on you from %s or your on %s !!!" %(user.name, user.name)
-
-        elif self.is_exists(self, user.comment_box) and not self.is_exists(user, self.comment_box):
-            return "You commented '%s' on %s." %(user.comment_box[self], user.name)
-
-        elif not self.is_exists(self, user.comment_box) and self.is_exists(user, self.comment_box):
-            return "%s commented '%s' on you." %(user.name, self.comment_box[user])
-
-        return ("You commented '%s' on %s.\n%s commented '%s' on you." % (user.comment_box[self],
+        elif self.is_exists(user.comment_box[self]) and self.is_exists(self.comment_box[user]):
+            return ("You commented '%s' on %s.\n%s commented '%s' on you." % (user.comment_box[self],
                                                                           user.name, user.name,
                                                                           self.comment_box[user]))
 
-    def is_exists(self, user, dict_box):
+        elif self.is_exists(user.comment_box[self]):
+            return "You commented '%s' on %s." %(user.comment_box[self], user.name)
+
+        elif self.is_exists(self.comment_box[user]):
+            return "%s commented '%s' on you." %(user.name, self.comment_box[user])
+
+        return "Don't have any comment either on you from %s or your on %s !!!" %(user.name, user.name)
+
+    def is_exists(self, test_message):
         """
         Checking whether present or not
         """
-        if user in dict_box.keys():
+        if test_message:
             return True
         return False
