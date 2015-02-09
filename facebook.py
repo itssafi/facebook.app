@@ -13,7 +13,7 @@ class FacebookUser(object):
         self.comment_box = {}
         self.message_box = {}
         self.dummy_message = {}
-        self.now = datetime.now()
+        self.now = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     def send_friend_request(self, user, msg=None):
         """
@@ -30,8 +30,9 @@ class FacebookUser(object):
 
         self.sent_friend_requests.append(user)
         user.friend_requests.append(self)
+
         if msg:
-            msg = msg+'   '+ str(self.now)
+            msg = msg+'-'+str(self.now)
             self.dummy_message[self] = msg
         return 'Friend request sent successefully to %s' %(user.name)
 
@@ -59,6 +60,17 @@ class FacebookUser(object):
 
             return 'You and %s now friends.' %(user.name)
 
+    def unfriend(self, user):
+        """
+        Unfriend from friend list
+        """
+        if user in self.list_of_friends:
+            user.list_of_friends.remove(self)
+            self.list_of_friends.remove(user)
+            return '%s is removed successfully from your friend list.' %(user.name)
+
+        return '%s is not in your friend list !!!'
+
     def send_message(self, user, msg):
         """
         Sending message to other friend
@@ -70,9 +82,22 @@ class FacebookUser(object):
             return "First accept %s's friend request !!!" %(user.name)
 
         if user not in self.list_of_friends:
-            return "Message sending fail !!!\n%s is not your friend" %s(user.name)
+            return "Message sending fail !!!\n%s is not your friend" %(user.name)
 
-        user.message_box[self].append(msg)
+        if user.message_box[self]:
+            import pdb; pdb.set_trace()
+            for msgt in user.message_box[self]:
+                if msgt.split('-')[1] == self.now:
+                    msg = msgt.split('-')[0]+', '+msg+'-'+ self.now
+                    user.message_box[self] = msg
+                    break
+                else:
+                    msg += '-'+ str(self.now)
+                    user.message_box[self].append(msg)
+                    break
+        else:
+            msg += '-'+ str(self.now)
+            user.message_box[self].append(msg)
         return 'Message sent successfully to %s' %(user.name)
 
     def show_friend_request(self):
@@ -129,7 +154,10 @@ class FacebookUser(object):
         """
         Showing message of your as well as your friend
         """
-        return 'Coming soon !!!'
+        if self.message_box[user]:
+            return self.message_box[user]
+
+        return 'No message from %s !!!' %(user.name)
 
     def show_comments(self, user=None):
         """
